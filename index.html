@@ -32,15 +32,16 @@
         .then((res) => res.json())
         .then((data) => {
           L.geoJSON(data, {
-            onEachFeature: function (feature, layer) {
-              const props = feature.properties;
-              const content = `
-                <strong>${props.address || "No address"}</strong><br/>
-                ${props.description || ""}<br/>
-                Architect: ${props.architect || "N/A"}<br/>
-                Permit Date: ${props.permit_date || "N/A"}
-              `;
-              layer.bindPopup(content);
+			onEachFeature: function (feature, layer) {
+    		const props = feature.properties;
+    	let popupContent = `
+       	 <strong>${props.address || props.PRIMARY_ADDRESS}</strong><br>
+       	 MAR ID: ${props.MAR_ID || 'N/A'}<br>
+       	 Status: ${props.STATUS || 'N/A'}
+    	`;
+    	layer.bindPopup(popupContent);
+		}
+
             },
           }).addTo(map);
         });
