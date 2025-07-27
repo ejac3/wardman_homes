@@ -26,24 +26,19 @@
         attribution: "&copy; OpenStreetMap contributors",
       }).addTo(map);
 
-      fetch(
-    fetch("https://raw.githubusercontent.com/ejac3/wardman_homes/main/wardman_buildings.geojson?")
-      )
-    
-	
+      // ✅ Corrected fetch block (no nested fetch or trailing question mark)
+      fetch("https://raw.githubusercontent.com/ejac3/wardman_homes/main/wardman_buildings.geojson")
         .then((res) => res.json())
         .then((data) => {
           L.geoJSON(data, {
-			onEachFeature: function (feature, layer) {
-    		const props = feature.properties;
-    	let popupContent = `
-       	 <strong>${props.address || props.PRIMARY_ADDRESS}</strong><br>
-       	 MAR ID: ${props.MAR_ID || 'N/A'}<br>
-       	 Status: ${props.STATUS || 'N/A'}
-    	`;
-    	layer.bindPopup(popupContent);
-		}
-
+            onEachFeature: function (feature, layer) {
+              const props = feature.properties;
+              let popupContent = `
+                <strong>${props.address || props.PRIMARY_ADDRESS}</strong><br>
+                MAR ID: ${props.MAR_ID || "N/A"}<br>
+                Status: ${props.STATUS || "N/A"}
+              `;
+              layer.bindPopup(popupContent);
             },
           }).addTo(map);
         });
