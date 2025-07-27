@@ -27,8 +27,10 @@
       }).addTo(map);
 
       fetch(
-        "https://raw.githubusercontent.com/ejac3/wardman_homes/main/wardman_buildings.geojson"
+    fetch("https://raw.githubusercontent.com/ejac3/wardman_homes/main/wardman_buildings.geojson?v=2")
       )
+    
+	
         .then((res) => res.json())
         .then((data) => {
           L.geoJSON(data, {
