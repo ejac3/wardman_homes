@@ -78,19 +78,18 @@
 
       // Custom icon for "You are here"
       const youAreHereIcon = L.icon({
-        iconUrl: "https://chart.googleapis.com/chart?chst=d_map_pin_icon&chld=home|00BFFF",
-        iconSize: [30, 48],
-        iconAnchor: [15, 48],
-        popupAnchor: [0, -40]
+        iconUrl: "you_are_here_icon.png",  // Hosted in your repo root
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -28]
       });
 
       // Bounding box for Washington, DC (approx)
       const dcBounds = L.latLngBounds(
-        [38.7916, -77.1198], // SW corner
-        [39.0036, -76.9094]  // NE corner
+        [38.7916, -77.1198], // SW
+        [39.0036, -76.9094]  // NE
       );
 
-      // Locate user
       map.locate({ setView: false, maxZoom: 16 });
 
       map.on("locationfound", function (e) {
