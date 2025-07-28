@@ -21,7 +21,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-      const map = L.map("map").setView([38.9072, -77.0369], 12);
+      const map = L.map("map").setView([38.9072, -77.0369], 14);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "&copy; OpenStreetMap contributors",
@@ -90,7 +90,7 @@
         [39.0036, -76.9094]  // NE
       );
 
-      map.locate({ setView: false, maxZoom: 16 });
+      map.locate({ setView: false, maxZoom: 18 });
 
       map.on("locationfound", function (e) {
         if (dcBounds.contains(e.latlng)) {
