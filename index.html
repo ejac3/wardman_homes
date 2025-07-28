@@ -26,31 +26,82 @@
         attribution: "&copy; OpenStreetMap contributors",
       }).addTo(map);
 
-      // ✅ Corrected fetch block (no nested fetch or trailing question mark)
+      // Color palette for Wards
+      const wardColors = {
+        "Ward 1": "red",
+        "Ward 2": "orange",
+        "Ward 3": "yellow",
+        "Ward 4": "green",
+        "Ward 5": "blue",
+        "Ward 6": "purple",
+        "Ward 7": "pink",
+        "Ward 8": "brown"
+      };
+
+      function getWardColor(ward) {
+        return wardColors[ward] || "gray";
+      }
+
       fetch("https://raw.githubusercontent.com/ejac3/wardman_homes/main/wardman_buildings.geojson")
         .then((res) => res.json())
         .then((data) => {
           L.geoJSON(data, {
+            pointToLayer: function (feature, latlng) {
+              const ward = feature.properties.WARD;
+              const color = getWardColor(ward);
+              return L.circleMarker(latlng, {
+                radius: 6,
+                fillColor: color,
+                color: "#333",
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.8,
+              });
+            },
             onEachFeature: function (feature, layer) {
-              const props = feature.properties;
-              let popupContent = `
-                <strong>${props.address || props.PRIMARY_ADDRESS}</strong><br>
-                MAR ID: ${props.MAR_ID || "N/A"}<br>
-                Status: ${props.STATUS || "N/A"}
+              const p = feature.properties;
+              const popupContent = `
+                <strong>${p.address || p.ADDRESS || "Unknown Address"}</strong><br>
+                ${p.description || ""}<br>
+                Architect: ${p.architect || "N/A"}<br>
+                Permit Date: ${p.permit_date || "N/A"}<br>
+                MAR ID: ${p.MAR_ID || "N/A"}<br>
+                Ward: ${p.WARD || "N/A"}<br>
+                Square: ${p.SQUARE || "N/A"} Lot: ${p.LOT || "N/A"}<br>
+                ${p.STREET_VIEW_URL ? `<a href="${p.STREET_VIEW_URL}" target="_blank">Street View</a>` : ""}
               `;
               layer.bindPopup(popupContent);
-            },
+            }
           }).addTo(map);
         });
 
-      // 📍 Geolocation
-      map.locate({ setView: true, maxZoom: 16 });
+      // Custom icon for "You are here"
+      const youAreHereIcon = L.icon({
+        iconUrl: "https://chart.googleapis.com/chart?chst=d_map_pin_icon&chld=home|00BFFF",
+        iconSize: [30, 48],
+        iconAnchor: [15, 48],
+        popupAnchor: [0, -40]
+      });
+
+      // Bounding box for Washington, DC (approx)
+      const dcBounds = L.latLngBounds(
+        [38.7916, -77.1198], // SW corner
+        [39.0036, -76.9094]  // NE corner
+      );
+
+      // Locate user
+      map.locate({ setView: false, maxZoom: 16 });
 
       map.on("locationfound", function (e) {
-        L.marker(e.latlng)
-          .addTo(map)
-          .bindPopup("You are here")
-          .openPopup();
+        if (dcBounds.contains(e.latlng)) {
+          L.marker(e.latlng, { icon: youAreHereIcon })
+            .addTo(map)
+            .bindPopup("You are here")
+            .openPopup();
+          map.setView(e.latlng, 15);
+        } else {
+          alert("You're outside Washington, DC — marker not shown.");
+        }
       });
 
       map.on("locationerror", function () {
