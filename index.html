@@ -1,30 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Wardman Homes Map</title>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <style>
+  <head>
+    <title>Wardman Homes Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <style>
       #map {
         height: 100vh;
         width: 100%;
       }
-  </style>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-</head>
-<body>
-  <div id="map"></div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> 
-  <script>
+    </style>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+  </head>
+  <body>
+    <div id="map"></div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
       const map = L.map("map").setView([38.9072, -77.0369], 12);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "&copy; OpenStreetMap contributors",
       }).addTo(map);
 
-      // Color palette for Wards
       const wardColors = {
         "Ward 1": "red",
         "Ward 2": "orange",
@@ -58,7 +60,7 @@
             },
             onEachFeature: function (feature, layer) {
               const p = feature.properties;
-              const popupContent = `
+              let popupContent = `
                 <strong>${p.address || p.ADDRESS || "Unknown Address"}</strong><br>
                 ${p.description || ""}<br>
                 Architect: ${p.architect || "N/A"}<br>
@@ -66,37 +68,37 @@
                 MAR ID: ${p.MAR_ID || "N/A"}<br>
                 Ward: ${p.WARD || "N/A"}<br>
                 Square: ${p.SQUARE || "N/A"} Lot: ${p.LOT || "N/A"}<br>
-                ${p.STREET_VIEW_URL ? `<a href="${p.STREET_VIEW_URL}" target="_blank">Street View</a>` : ""}
+                ${p.STREET_VIEW_URL ? `<a href="${p.STREET_VIEW_URL}" target="_blank">Street View</a><br>` : ""}
               `;
-                // Add easement images for specific MAR_IDs
-  				const easementMARs = [231412, 231413, 231414];
- 				if (easementMARs.includes(p.MAR_ID)) {
-    			popupContent += `
-      			<br><em>Easement Images:</em><br>
-      			<a href="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving1.jpeg" target="_blank">
-        		<img src="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving1.jpeg" width="100">
-      			</a>
-      			<a href="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving2.jpeg" target="_blank">
-        		<img src="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving2.jpeg" width="100">
-     			 </a>
-    			`;
+
+              const easementMARs = [231412, 231413, 231414];
+              if (easementMARs.includes(p.MAR_ID)) {
+                popupContent += `
+                  <br><em>Easement Images:</em><br>
+                  <a href="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving1.jpeg" target="_blank">
+                    <img src="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving1.jpeg" width="100">
+                  </a>
+                  <a href="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving2.jpeg" target="_blank">
+                    <img src="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving2.jpeg" width="100">
+                  </a>
+                `;
+              }
+
               layer.bindPopup(popupContent);
             }
           }).addTo(map);
         });
 
-      // Custom icon for "You are here"
       const youAreHereIcon = L.icon({
-        iconUrl: "you_are_here_icon.png",  // Hosted in your repo root
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -28]
+        iconUrl: "https://raw.githubusercontent.com/ejac3/wardman_homes/main/you_are_here_icon.png",
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
       });
 
-      // Bounding box for Washington, DC (approx)
       const dcBounds = L.latLngBounds(
-        [38.7916, -77.1198], // SW
-        [39.0036, -76.9094]  // NE
+        [38.7916, -77.1198],
+        [39.0036, -76.9094]
       );
 
       map.locate({ setView: false, maxZoom: 16 });
@@ -116,6 +118,6 @@
       map.on("locationerror", function () {
         alert("Location access denied or unavailable.");
       });
-  </script>
-</body>
+    </script>
+  </body>
 </html>
