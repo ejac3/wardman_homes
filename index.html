@@ -1,27 +1,24 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Wardman Homes Map</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
-    <style>
+<head>
+  <title>Wardman Homes Map</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
       #map {
         height: 100vh;
         width: 100%;
       }
-    </style>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-  </head>
-  <body>
-    <div id="map"></div>
+  </style>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> 
+  <script>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-      const map = L.map("map").setView([38.9072, -77.0369], 14);
+      const map = L.map("map").setView([38.9072, -77.0369], 12);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "&copy; OpenStreetMap contributors",
@@ -71,6 +68,18 @@
                 Square: ${p.SQUARE || "N/A"} Lot: ${p.LOT || "N/A"}<br>
                 ${p.STREET_VIEW_URL ? `<a href="${p.STREET_VIEW_URL}" target="_blank">Street View</a>` : ""}
               `;
+                // Add easement images for specific MAR_IDs
+  				const easementMARs = [231412, 231413, 231414];
+ 				if (easementMARs.includes(p.MAR_ID)) {
+    			popupContent += `
+      			<br><em>Easement Images:</em><br>
+      			<a href="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving1.jpeg" target="_blank">
+        		<img src="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving1.jpeg" width="100">
+      			</a>
+      			<a href="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving2.jpeg" target="_blank">
+        		<img src="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving2.jpeg" width="100">
+     			 </a>
+    			`;
               layer.bindPopup(popupContent);
             }
           }).addTo(map);
@@ -90,7 +99,7 @@
         [39.0036, -76.9094]  // NE
       );
 
-      map.locate({ setView: false, maxZoom: 18 });
+      map.locate({ setView: false, maxZoom: 16 });
 
       map.on("locationfound", function (e) {
         if (dcBounds.contains(e.latlng)) {
@@ -107,6 +116,6 @@
       map.on("locationerror", function () {
         alert("Location access denied or unavailable.");
       });
-    </script>
-  </body>
+  </script>
+</body>
 </html>
