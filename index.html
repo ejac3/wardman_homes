@@ -71,17 +71,17 @@
                 ${p.STREET_VIEW_URL ? `<a href="${p.STREET_VIEW_URL}" target="_blank">Street View</a><br>` : ""}
               `;
 
-              const easementMARs = [231412, 231413, 231414];
-              if (easementMARs.includes(p.MAR_ID)) {
-                popupContent += `
-                  <br><em>Easement Images:</em><br>
-                  <a href="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving1.jpeg" target="_blank">
-                    <img src="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving1.jpeg" width="100">
-                  </a>
-                  <a href="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving2.jpeg" target="_blank">
-                    <img src="https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/1100_Irving/1100_Irving2.jpeg" width="100">
-                  </a>
-                `;
+              // Dynamically load images from GeoJSON properties
+              if (p.image_folder && p.image_files && Array.isArray(p.image_files)) {
+                popupContent += `<br><em>Images:</em><br>`;
+                p.image_files.forEach(filename => {
+                  const url = `https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/${p.image_folder}/${filename}`;
+                  popupContent += `
+                    <a href="${url}" target="_blank">
+                      <img src="${url}" width="100" style="margin: 2px;">
+                    </a>
+                  `;
+                });
               }
 
               layer.bindPopup(popupContent);
