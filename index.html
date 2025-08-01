@@ -40,11 +40,6 @@
       <br><br>
       <label>Filter by Architect:</label><br>
       <input type="text" id="architectFilter" placeholder="e.g. Beers, A. H." style="width: 100%;" />
-      <br><br>
-      <label>Permit Year Range:</label><br>
-      <input type="number" id="startYear" placeholder="From" style="width: 48%;" />
-      <input type="number" id="endYear" placeholder="To" style="width: 48%;" />
-      <br><br>
       <button onclick="applyFilters()">Apply Filters</button>
     </div>
 
@@ -79,21 +74,17 @@
         const showOnlyWithImages = document.getElementById("filterImagesCheckbox").checked;
         const selectedWard = document.getElementById("wardFilter").value;
         const architectSearch = document.getElementById("architectFilter").value.toLowerCase().trim();
-        const startYear = parseInt(document.getElementById("startYear").value);
-        const endYear = parseInt(document.getElementById("endYear").value);
-        loadAndRenderGeoJSON(showOnlyWithImages, selectedWard, architectSearch, startYear, endYear);
+        loadAndRenderGeoJSON(showOnlyWithImages, selectedWard, architectSearch);
       }
 
-      function loadAndRenderGeoJSON(showOnlyWithImages = false, ward = "", architect = "", startYear = null, endYear = null) {
+      function loadAndRenderGeoJSON(showOnlyWithImages = false, ward = "", architect = "") {
+        if (geojsonLayer) {
+          map.removeLayer(geojsonLayer);
+        }
+
         fetch("https://raw.githubusercontent.com/ejac3/wardman_homes/main/wardman_buildings.geojson")
           .then((res) => res.json())
           .then((data) => {
-            console.log("✅ GeoJSON loaded, total features:", data.features.length);
-
-            if (geojsonLayer) {
-              map.removeLayer(geojsonLayer);
-            }
-
             const filteredData = {
               type: "FeatureCollection",
               features: data.features.filter(feature => {
@@ -108,24 +99,9 @@
 
                 if (architect && (!p.architect || !p.architect.toLowerCase().includes(architect))) return false;
 
-                let permitYear = null;
-                if (p.permit_date && typeof p.permit_date === "string" && p.permit_date.includes("/")) {
-                  const parts = p.permit_date.split("/");
-                  if (parts.length === 3 && !isNaN(parts[2])) {
-                    permitYear = parseInt(parts[2]);
-                  }
-                }
-
-                if ((startYear && (!permitYear || permitYear < startYear)) ||
-                    (endYear && (!permitYear || permitYear > endYear))) {
-                  return false;
-                }
-
                 return true;
               })
             };
-
-            console.log("✅ Filtered features:", filteredData.features.length);
 
             geojsonLayer = L.geoJSON(filteredData, {
               pointToLayer: function (feature, latlng) {
@@ -171,7 +147,7 @@
           });
       }
 
-      loadAndRenderGeoJSON(false, "", "", null, null);
+      loadAndRenderGeoJSON(); // Initial load
 
       const youAreHereIcon = L.icon({
         iconUrl: "https://raw.githubusercontent.com/ejac3/wardman_homes/main/you_are_here_icon.png",
