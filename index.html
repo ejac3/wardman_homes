@@ -91,16 +91,16 @@
           console.log("✅ GeoJSON loaded, total features:", data.features.length);
 
 		// TEMPORARY: force all features to render (bypass filters)
-			const filteredData = {
-  type: "FeatureCollection",
-  features: data.features.filter(feature => {
-    const p = feature.properties;
-    if (!p) return false; // safety: skip if properties is undefined
+	//		const filteredData = {
+  //type: "FeatureCollection",
+  //features: data.features.filter(feature => {
+  //  const p = feature.properties;
+  //  if (!p) return false; // safety: skip if properties is undefined
 
     // Filter: only homes with images
-    if (showOnlyWithImages && !(p.image_folder && Array.isArray(p.image_files) && p.image_files.length > 0)) {
-      return false;
-    }
+    //if (showOnlyWithImages && !(p.image_folder && Array.isArray(p.image_files) && p.image_files.length > 0)) {
+   //   return false;
+   // }
 
     // Filter: by Ward
     if (ward && p.WARD !== ward) return false;
