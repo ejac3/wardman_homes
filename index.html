@@ -40,6 +40,7 @@
       <br><br>
       <label>Filter by Architect:</label><br>
       <input type="text" id="architectFilter" placeholder="e.g. Beers, A. H." style="width: 100%;" />
+      <br><br>
       <button onclick="applyFilters()">Apply Filters</button>
     </div>
 
@@ -54,12 +55,12 @@
       }).addTo(map);
 
       const wardColors = {
-        "Ward 1": "red",
+        "Ward 1": "yellow",
         "Ward 2": "orange",
-        "Ward 3": "yellow",
+        "Ward 3": "purple",
         "Ward 4": "green",
         "Ward 5": "blue",
-        "Ward 6": "purple",
+        "Ward 6": "red",
         "Ward 7": "pink",
         "Ward 8": "brown"
       };
@@ -78,13 +79,15 @@
       }
 
       function loadAndRenderGeoJSON(showOnlyWithImages = false, ward = "", architect = "") {
-        if (geojsonLayer) {
-          map.removeLayer(geojsonLayer);
-        }
-
         fetch("https://raw.githubusercontent.com/ejac3/wardman_homes/main/wardman_buildings.geojson")
           .then((res) => res.json())
           .then((data) => {
+            console.log("✅ GeoJSON loaded, total features:", data.features.length);
+
+            if (geojsonLayer) {
+              map.removeLayer(geojsonLayer);
+            }
+
             const filteredData = {
               type: "FeatureCollection",
               features: data.features.filter(feature => {
@@ -102,6 +105,8 @@
                 return true;
               })
             };
+
+            console.log("✅ Filtered features:", filteredData.features.length);
 
             geojsonLayer = L.geoJSON(filteredData, {
               pointToLayer: function (feature, latlng) {
@@ -147,14 +152,7 @@
           });
       }
 
-      loadAndRenderGeoJSON(); // Initial load
-
-const youAreHereIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  iconSize: [30, 30],
-  iconAnchor: [15, 30],
-  popupAnchor: [0, -30]
-});
+      loadAndRenderGeoJSON(false, "", "");
 
       const dcBounds = L.latLngBounds(
         [38.7916, -77.1198],
@@ -165,7 +163,7 @@ const youAreHereIcon = L.icon({
 
       map.on("locationfound", function (e) {
         if (dcBounds.contains(e.latlng)) {
-          L.marker(e.latlng, { icon: youAreHereIcon })
+          L.marker(e.latlng)
             .addTo(map)
             .bindPopup("You are here")
             .openPopup();
