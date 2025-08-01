@@ -92,32 +92,40 @@
 
 		// TEMPORARY: force all features to render (bypass filters)
 			const filteredData = {
-  			type: "FeatureCollection",
-  			features: data.features
-			};
-            if (geojsonLayer) {
-              map.removeLayer(geojsonLayer);
-            }
+  type: "FeatureCollection",
+  features: data.features.filter(feature => {
+    const p = feature.properties;
+    if (!p) return false; // safety: skip if properties is undefined
 
-            const filteredData = {
-              type: "FeatureCollection",
-              features: data.features.filter(feature => {
-                const p = feature.properties;
+    // Filter: only homes with images
+    if (showOnlyWithImages && !(p.image_folder && Array.isArray(p.image_files) && p.image_files.length > 0)) {
+      return false;
+    }
 
-                if (showOnlyWithImages && !(p.image_folder && Array.isArray(p.image_files) && p.image_files.length > 0)) {
-                  return false;
-                }
+    // Filter: by Ward
+    if (ward && p.WARD !== ward) return false;
 
-                if (ward && p.WARD !== ward) return false;
+    // Filter: by Architect (case-insensitive substring match)
+    if (architect && (!p.architect || !p.architect.toLowerCase().includes(architect))) return false;
 
-                if (architect && (!p.architect || !p.architect.toLowerCase().includes(architect))) return false;
+    // Filter: by Permit Year
+    let permitYear = null;
+    if (p.permit_date && typeof p.permit_date === "string" && p.permit_date.includes("/")) {
+      const parts = p.permit_date.split("/");
+      if (parts.length === 3 && !isNaN(parts[2])) {
+        permitYear = parseInt(parts[2]);
+      }
+    }
 
-                if (p.permit_date) {
-                  const dateParts = p.permit_date.split("/");
-                  const permitYear = parseInt(dateParts[2]);
-                  if ((startYear && permitYear < startYear) || (endYear && permitYear > endYear)) {
-                    return false;
-                  }
+    if ((startYear && (!permitYear || permitYear < startYear)) ||
+        (endYear && (!permitYear || permitYear > endYear))) {
+      return false;
+    }
+
+    return true; // passed all filters
+  })
+};
+}
                 }
 
                 return true;
