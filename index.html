@@ -149,12 +149,12 @@
 
       loadAndRenderGeoJSON(); // Initial load
 
-      const youAreHereIcon = L.icon({
-        iconUrl: "https://raw.githubusercontent.com/ejac3/wardman_homes/main/you_are_here_icon.png",
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
-      });
+const youAreHereIcon = L.icon({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  iconSize: [30, 30],
+  iconAnchor: [15, 30],
+  popupAnchor: [0, -30]
+});
 
       const dcBounds = L.latLngBounds(
         [38.7916, -77.1198],
