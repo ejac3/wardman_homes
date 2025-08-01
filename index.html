@@ -88,6 +88,13 @@
         fetch("https://raw.githubusercontent.com/ejac3/wardman_homes/main/wardman_buildings.geojson")
           .then((res) => res.json())
           .then((data) => {
+          console.log("✅ GeoJSON loaded, total features:", data.features.length);
+
+		// TEMPORARY: force all features to render (bypass filters)
+			const filteredData = {
+  			type: "FeatureCollection",
+  			features: data.features
+			};
             if (geojsonLayer) {
               map.removeLayer(geojsonLayer);
             }
