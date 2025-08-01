@@ -1,86 +1,207 @@
-function loadAndRenderGeoJSON(showOnlyWithImages = false, ward = "", architect = "", startYear = null, endYear = null) {
-  fetch("https://raw.githubusercontent.com/ejac3/wardman_homes/main/wardman_buildings.geojson")
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("✅ GeoJSON loaded, total features:", data.features.length);
-
-      if (geojsonLayer) {
-        map.removeLayer(geojsonLayer);
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Wardman Homes Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <style>
+      #map {
+        height: 100vh;
+        width: 100%;
       }
+    </style>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+  </head>
+  <body>
 
-      const filteredData = {
-        type: "FeatureCollection",
-        features: data.features.filter(feature => {
-          const p = feature.properties;
-          if (!p) return false;
+    <!-- 🔍 FILTER PANEL -->
+    <div id="filters" style="position: absolute; z-index: 999; background: white; padding: 10px; border: 1px solid #ccc; margin: 10px; max-width: 280px;">
+      <label>
+        <input type="checkbox" id="filterImagesCheckbox" />
+        Show only homes with images
+      </label>
+      <br><br>
+      <label>Filter by Ward:</label><br>
+      <select id="wardFilter">
+        <option value="">All Wards</option>
+        <option value="Ward 1">Ward 1</option>
+        <option value="Ward 2">Ward 2</option>
+        <option value="Ward 3">Ward 3</option>
+        <option value="Ward 4">Ward 4</option>
+        <option value="Ward 5">Ward 5</option>
+        <option value="Ward 6">Ward 6</option>
+        <option value="Ward 7">Ward 7</option>
+        <option value="Ward 8">Ward 8</option>
+      </select>
+      <br><br>
+      <label>Filter by Architect:</label><br>
+      <input type="text" id="architectFilter" placeholder="e.g. Beers, A. H." style="width: 100%;" />
+      <br><br>
+      <label>Permit Year Range:</label><br>
+      <input type="number" id="startYear" placeholder="From" style="width: 48%;" />
+      <input type="number" id="endYear" placeholder="To" style="width: 48%;" />
+      <br><br>
+      <button onclick="applyFilters()">Apply Filters</button>
+    </div>
 
-          if (showOnlyWithImages && !(p.image_folder && Array.isArray(p.image_files) && p.image_files.length > 0)) {
-            return false;
-          }
+    <div id="map"></div>
 
-          if (ward && p.WARD !== ward) return false;
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      const map = L.map("map").setView([38.9072, -77.0369], 12);
 
-          if (architect && (!p.architect || !p.architect.toLowerCase().includes(architect))) return false;
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
 
-          let permitYear = null;
-          if (p.permit_date && typeof p.permit_date === "string" && p.permit_date.includes("/")) {
-            const parts = p.permit_date.split("/");
-            if (parts.length === 3 && !isNaN(parts[2])) {
-              permitYear = parseInt(parts[2]);
-            }
-          }
-
-          if ((startYear && (!permitYear || permitYear < startYear)) ||
-              (endYear && (!permitYear || permitYear > endYear))) {
-            return false;
-          }
-
-          return true;
-        })
+      const wardColors = {
+        "Ward 1": "red",
+        "Ward 2": "orange",
+        "Ward 3": "yellow",
+        "Ward 4": "green",
+        "Ward 5": "blue",
+        "Ward 6": "purple",
+        "Ward 7": "pink",
+        "Ward 8": "brown"
       };
 
-      console.log("✅ Filtered features:", filteredData.features.length);
+      function getWardColor(ward) {
+        return wardColors[ward] || "gray";
+      }
 
-      geojsonLayer = L.geoJSON(filteredData, {
-        pointToLayer: function (feature, latlng) {
-          const ward = feature.properties.WARD;
-          const color = getWardColor(ward);
-          return L.circleMarker(latlng, {
-            radius: 6,
-            fillColor: color,
-            color: "#333",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8,
+      let geojsonLayer;
+
+      function applyFilters() {
+        const showOnlyWithImages = document.getElementById("filterImagesCheckbox").checked;
+        const selectedWard = document.getElementById("wardFilter").value;
+        const architectSearch = document.getElementById("architectFilter").value.toLowerCase().trim();
+        const startYear = parseInt(document.getElementById("startYear").value);
+        const endYear = parseInt(document.getElementById("endYear").value);
+        loadAndRenderGeoJSON(showOnlyWithImages, selectedWard, architectSearch, startYear, endYear);
+      }
+
+      function loadAndRenderGeoJSON(showOnlyWithImages = false, ward = "", architect = "", startYear = null, endYear = null) {
+        fetch("https://raw.githubusercontent.com/ejac3/wardman_homes/main/wardman_buildings.geojson")
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("✅ GeoJSON loaded, total features:", data.features.length);
+
+            if (geojsonLayer) {
+              map.removeLayer(geojsonLayer);
+            }
+
+            const filteredData = {
+              type: "FeatureCollection",
+              features: data.features.filter(feature => {
+                const p = feature.properties;
+                if (!p) return false;
+
+                if (showOnlyWithImages && !(p.image_folder && Array.isArray(p.image_files) && p.image_files.length > 0)) {
+                  return false;
+                }
+
+                if (ward && p.WARD !== ward) return false;
+
+                if (architect && (!p.architect || !p.architect.toLowerCase().includes(architect))) return false;
+
+                let permitYear = null;
+                if (p.permit_date && typeof p.permit_date === "string" && p.permit_date.includes("/")) {
+                  const parts = p.permit_date.split("/");
+                  if (parts.length === 3 && !isNaN(parts[2])) {
+                    permitYear = parseInt(parts[2]);
+                  }
+                }
+
+                if ((startYear && (!permitYear || permitYear < startYear)) ||
+                    (endYear && (!permitYear || permitYear > endYear))) {
+                  return false;
+                }
+
+                return true;
+              })
+            };
+
+            console.log("✅ Filtered features:", filteredData.features.length);
+
+            geojsonLayer = L.geoJSON(filteredData, {
+              pointToLayer: function (feature, latlng) {
+                const ward = feature.properties.WARD;
+                const color = getWardColor(ward);
+                return L.circleMarker(latlng, {
+                  radius: 6,
+                  fillColor: color,
+                  color: "#333",
+                  weight: 1,
+                  opacity: 1,
+                  fillOpacity: 0.8,
+                });
+              },
+              onEachFeature: function (feature, layer) {
+                const p = feature.properties;
+                let popupContent = `
+                  <strong>${p.address || p.ADDRESS || "Unknown Address"}</strong><br>
+                  ${p.description || ""}<br>
+                  Architect: ${p.architect || "N/A"}<br>
+                  Permit Date: ${p.permit_date || "N/A"}<br>
+                  MAR ID: ${p.MAR_ID || "N/A"}<br>
+                  Ward: ${p.WARD || "N/A"}<br>
+                  Square: ${p.SQUARE || "N/A"} Lot: ${p.LOT || "N/A"}<br>
+                  ${p.STREET_VIEW_URL ? `<a href="${p.STREET_VIEW_URL}" target="_blank">Street View</a><br>` : ""}
+                `;
+
+                if (p.image_folder && p.image_files && Array.isArray(p.image_files)) {
+                  popupContent += `<br><em>Images:</em><br>`;
+                  p.image_files.forEach(filename => {
+                    const url = `https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/${p.image_folder}/${filename}`;
+                    popupContent += `
+                      <a href="${url}" target="_blank">
+                        <img src="${url}" width="100" style="margin: 2px;">
+                      </a>
+                    `;
+                  });
+                }
+
+                layer.bindPopup(popupContent);
+              }
+            }).addTo(map);
           });
-        },
-        onEachFeature: function (feature, layer) {
-          const p = feature.properties;
-          let popupContent = `
-            <strong>${p.address || p.ADDRESS || "Unknown Address"}</strong><br>
-            ${p.description || ""}<br>
-            Architect: ${p.architect || "N/A"}<br>
-            Permit Date: ${p.permit_date || "N/A"}<br>
-            MAR ID: ${p.MAR_ID || "N/A"}<br>
-            Ward: ${p.WARD || "N/A"}<br>
-            Square: ${p.SQUARE || "N/A"} Lot: ${p.LOT || "N/A"}<br>
-            ${p.STREET_VIEW_URL ? `<a href="${p.STREET_VIEW_URL}" target="_blank">Street View</a><br>` : ""}
-          `;
+      }
 
-          if (p.image_folder && p.image_files && Array.isArray(p.image_files)) {
-            popupContent += `<br><em>Images:</em><br>`;
-            p.image_files.forEach(filename => {
-              const url = `https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/${p.image_folder}/${filename}`;
-              popupContent += `
-                <a href="${url}" target="_blank">
-                  <img src="${url}" width="100" style="margin: 2px;">
-                </a>
-              `;
-            });
-          }
+      loadAndRenderGeoJSON(false, "", "", null, null);
 
-          layer.bindPopup(popupContent);
+      const youAreHereIcon = L.icon({
+        iconUrl: "https://raw.githubusercontent.com/ejac3/wardman_homes/main/you_are_here_icon.png",
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+      });
+
+      const dcBounds = L.latLngBounds(
+        [38.7916, -77.1198],
+        [39.0036, -76.9094]
+      );
+
+      map.locate({ setView: false, maxZoom: 16 });
+
+      map.on("locationfound", function (e) {
+        if (dcBounds.contains(e.latlng)) {
+          L.marker(e.latlng, { icon: youAreHereIcon })
+            .addTo(map)
+            .bindPopup("You are here")
+            .openPopup();
+          map.setView(e.latlng, 15);
+        } else {
+          alert("You're outside Washington, DC — marker not shown.");
         }
-      }).addTo(map);
-    });
-}
+      });
+
+      map.on("locationerror", function () {
+        alert("Location access denied or unavailable.");
+      });
+    </script>
+  </body>
+</html>
