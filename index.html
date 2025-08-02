@@ -19,7 +19,7 @@
   <body>
 
     <!-- 🔍 FILTER PANEL -->
-    <div id="filters" style="position: absolute; top: 10px; right: 10px; z-index: 999; background: white; padding: 10px; border: 1px solid #ccc; max-width: 280px;">
+    <div id="filters" style="position: absolute; bottom: 10px; left: 10px; z-index: 999; background: white; padding: 10px; border: 1px solid #ccc; max-width: 280px;">
       <label>
         <input type="checkbox" id="filterImagesCheckbox" />
         Show only homes with images
@@ -134,9 +134,12 @@
                   ${typeof p.STREET_VIEW_URL === "string" && p.STREET_VIEW_URL.startsWith("http") ? `<a href="${p.STREET_VIEW_URL}" target="_blank">Street View</a><br>` : ""}
                 `;
 
-                if (p.SQUARE && p.LOT) {
-  const sslFormatted = p.SQUARE.toString().padStart(4, '0') + p.LOT.toString().padStart(4, '0');
-  const deedUrl = `https://research.salixdata.com/Recorder/DC-Washington/Search?searchType=basic&searchSubType=parcel&parcelNumber=${sslFormatted}`;
+                // Deed search link temporarily disabled due to format issues
+// if (p.SQUARE && p.LOT) {
+//   const sslFormatted = p.SQUARE.toString().padStart(4, '0') + p.LOT.toString().padStart(4, '0');
+//   const deedUrl = `https://research.salixdata.com/Recorder/DC-Washington/Search?searchType=basic&searchSubType=parcel&parcelNumber=${sslFormatted}`;
+//   popupContent += `<a href="${deedUrl}" target="_blank">Search deeds & agreements for SSL: ${p.SQUARE}-${p.LOT}</a><br>`;
+// }`;
   popupContent += `<a href="${deedUrl}" target="_blank">Search deeds & agreements for SSL: ${p.SQUARE}-${p.LOT}</a><br>`;
 }+${p.LOT}" target="_blank">Search deeds & agreements for SSL: ${p.SQUARE} ${p.LOT}</a><br>`;
                 }
