@@ -138,11 +138,11 @@
 // if (p.SQUARE && p.LOT) {
 //   const sslFormatted = p.SQUARE.toString().padStart(4, '0') + p.LOT.toString().padStart(4, '0');
 //   const deedUrl = `https://research.salixdata.com/Recorder/DC-Washington/Search?searchType=basic&searchSubType=parcel&parcelNumber=${sslFormatted}`;
-//   popupContent += `<a href="${deedUrl}" target="_blank">Search deeds & agreements for SSL: ${p.SQUARE}-${p.LOT}</a><br>`;
+//   // popupContent += `<a href="${deedUrl}" target="_blank">Search deeds & agreements for SSL: ${p.SQUARE}-${p.LOT}</a><br>`; // temporarily disabled
 // }`;
-//  popupContent += `<a href="${deedUrl}" target="_blank">Search deeds & agreements for SSL: ${p.SQUARE}-${p.LOT}</a><br>`;
-//+${p.LOT}" target="_blank">Search deeds & agreements for SSL: ${p.SQUARE} ${p.LOT}</a><br>`;
-               // }
+  popupContent += `<a href="${deedUrl}" target="_blank">Search deeds & agreements for SSL: ${p.SQUARE}-${p.LOT}</a><br>`;
+// Removed invalid leftover code from previous deed link attempt
+                }
 
                 if (p.image_folder && p.image_files && Array.isArray(p.image_files)) {
                   popupContent += `<br><em>Images:</em><br>`;
