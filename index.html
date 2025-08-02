@@ -144,7 +144,7 @@
 // Removed invalid leftover code from previous deed link attempt
                 }
 
-                if (p.image_folder && p.image_files && Array.isArray(p.image_files)) {
+if (p.image_folder && p.image_files && Array.isArray(p.image_files)) {
                   popupContent += `<br><em>Images:</em><br>`;
                   p.image_files.forEach(filename => {
                     const url = `https://raw.githubusercontent.com/ejac3/wardman_homes/main/Wardman_images/${p.image_folder}/${filename}`;
