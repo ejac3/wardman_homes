@@ -69,11 +69,10 @@
       function applyFilters() {
         const showOnlyWithImages = document.getElementById("filterImagesCheckbox").checked;
         const selectedWard = document.getElementById("wardFilter").value;
-        const architectSearch = document.getElementById("architectFilter").value.toLowerCase().trim();
-        loadAndRenderGeoJSON(showOnlyWithImages, selectedWard, architectSearch);
+                loadAndRenderGeoJSON(showOnlyWithImages, selectedWard);
       }
 
-      function loadAndRenderGeoJSON(showOnlyWithImages = false, ward = "", architect = "") {
+      function loadAndRenderGeoJSON(showOnlyWithImages = false, ward = "") {
         fetch("https://raw.githubusercontent.com/ejac3/wardman_homes/main/wardman_buildings.geojson")
           .then((res) => res.json())
           .then((data) => {
@@ -95,8 +94,7 @@
 
                 if (ward && p.WARD !== ward) return false;
 
-                if (architect && (!p.architect || !p.architect.toLowerCase().includes(architect))) return false;
-
+                
                 return true;
               })
             };
