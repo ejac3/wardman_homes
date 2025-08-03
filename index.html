@@ -20,10 +20,7 @@
 
     <!-- 🔍 FILTER PANEL -->
     <div id="filters" style="position: absolute; bottom: 10px; left: 10px; z-index: 999; background: white; padding: 10px; border: 1px solid #ccc; max-width: 280px;">
-      <label>
-        <input type="checkbox" id="filterImagesCheckbox" />
-        Show only homes with images
-      </label>
+      <label><input type="checkbox" id="filterImagesCheckbox" /> w/easement photos</label>
       <br><br>
       <label>Filter by Ward:</label><br>
       <select id="wardFilter">
@@ -38,9 +35,7 @@
         <option value="Ward 8">Ward 8</option>
       </select>
       <br><br>
-      <label>Filter by Architect:</label><br>
-      <input type="text" id="architectFilter" placeholder="e.g. Beers, A. H." style="width: 100%;" />
-      <br><br>
+      
       <button onclick="applyFilters()">Apply Filters</button>
     </div>
 
